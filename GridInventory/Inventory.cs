@@ -83,7 +83,7 @@ class Inventory
         if (itemGrid[gridCoords.X, gridCoords.Y] == null)
         {
             return null;
-        }           
+        }
         return itemGrid[gridCoords.X, gridCoords.Y];
     }
     public bool IsSquareEmpty(Vector2i gridCoords)
@@ -95,56 +95,63 @@ class Inventory
         Vector2i mousePos = Graphics.MousePos();
         switch (e.Button)
         {
-            case (Mouse.Button.Left):
-                if (selectedItem != null)
+            case Mouse.Button.Right:
+                if (!IsSquareEmpty(mousePos) && itemGrid[mousePos.X, mousePos.Y] is Weapon weaponToRemove)
                 {
-                    if (itemGrid[mousePos.X, mousePos.Y] != null && itemGrid[mousePos.X, mousePos.Y] is Weapon weapon && selectedItem is Attachment attachment)
+                    weaponToRemove.RemoveAttachment(Item.AttachmentType.Magazine);
+                }
+                break;
+            case Mouse.Button.Left:
+                if (selectedItem == null)
+                    return;
+
+                if (!IsSquareEmpty(mousePos) && itemGrid[mousePos.X, mousePos.Y] is Weapon weapon && selectedItem is Attachment attachment)
+                {
+                    if (weapon.attachments[(int)attachment.type] == null && weapon.CanResize(new Vector2i(0, 1)))
                     {
-                        if (weapon.attachments[(int)attachment.type] != null)
-                        {
-                            MoveItem(selectedItem, selectedItem.oldPos);
-                            selectedItem = null;
-                            hasItemSelected = false;
-                        }
-                        else
-                        {
-                            weapon.AddAttachment(attachment);
-                            selectedItem = null;
-                            hasItemSelected = false;
-                        }
+                        weapon.AddAttachment(attachment);
+                        weapon.Resize(new Vector2i(0, 1));
                     }
                     else
                     {
-                        bool areSquaresAvailable = true;
-                        for (int i = mousePos.X; i < mousePos.X + selectedItem.size.X; i++)
-                        {
-                            for (int j = mousePos.Y; j < mousePos.Y + selectedItem.size.Y; j++)
-                            {
-                                if (itemGrid[i, j] != null && itemGrid[i, j] != selectedItem)
-                                {
-                                    areSquaresAvailable = false;
-                                }
-                            }
-                        }
-                        if (areSquaresAvailable)
-                        {
-                            MoveItem(selectedItem, mousePos);
-                            selectedItem = null;
-                            hasItemSelected = false;
-                        }
-                        else
-                        {
-                            MoveItem(selectedItem, selectedItem.oldPos);
-                            selectedItem = null;
-                            hasItemSelected = false;
-                        }
+                        MoveItem(selectedItem, selectedItem.oldPos);
                     }
-
                 }
-            break;
+                else
+                {
+                    bool areSquaresAvailable = AreSquaresAvailable(mousePos);
+
+                    if (areSquaresAvailable)
+                    {
+                        MoveItem(selectedItem, mousePos);
+                    }
+                    else
+                    {
+                        MoveItem(selectedItem, selectedItem.oldPos);
+                    }
+                }
+                selectedItem = null;
+                hasItemSelected = false;
+                break;
         }
     }
+    public bool AreSquaresAvailable(Vector2i mousePos)
+    {
+        bool areSquaresAvailable = true;
+        for (int i = mousePos.X; i < mousePos.X + selectedItem.size.X; i++)
+        {
+            for (int j = mousePos.Y; j < mousePos.Y + selectedItem.size.Y; j++)
+            {
+                if ((i > 29 | j > 17 || i < 0 || j < 0) || itemGrid[i, j] != null && itemGrid[i, j] != selectedItem)
+                {
+                    areSquaresAvailable = false;
+                }
+                
 
+            }
+        }
+        return areSquaresAvailable;
+    }
     public void ButtonPressed(object sender, MouseButtonEventArgs e)
     {
         Vector2i mousePos = Graphics.MousePos();
@@ -175,7 +182,7 @@ class Inventory
                     {
                         if (itemGrid[i, j] != null && itemGrid[i, j] != selectedItem)
                         {
-                            if (itemGrid[i, j] is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.attachments[(int)attachment.type] == null)
+                            if (itemGrid[i, j] is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType))
                             {
                                 rectangle.Position = weapon.sprite.Position;
                                 rectangle.Size = (Vector2f)weapon.size * 32;

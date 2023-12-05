@@ -12,7 +12,7 @@ class Item
     {
         Magazine,
         Scope,
-        Barrel
+        Muzzle
     }
     public Vector2i inventoryPos { get; set; }
     public Sprite sprite {get; set;}
@@ -93,7 +93,15 @@ class Weapon : Item
         }
         Vector2f weaponSpritePos = sprite.Position;
         attachment.sprite.Position = new Vector2f(weaponSpritePos.X, weaponSpritePos.Y) + attachment.spriteOffset;
-        Console.WriteLine("attached");
+    }
+    public void RemoveAttachment(AttachmentType attachmentType)
+    {
+        if (attachments[(int)attachmentType] == null)
+            return;
+        Attachment newAttachment = attachments[(int)attachmentType];
+        attachments[(int)attachmentType] = null;
+        GridInventory.inv.MoveItem(newAttachment, new Vector2i(0, 0));
+        Resize(new Vector2i(0, -1));
     }
     public bool IsAttachmentCompatible(Attachment attachment)
     {
@@ -106,13 +114,67 @@ class Weapon : Item
         }
         return false;
     }
+    public bool IsAttachmentSlotEmpty(AttachmentType attachmentType)
+    {
+        return attachments[(int)attachmentType] == null;
+    }
+    public bool CanResize(Vector2i addedSize)
+    {
+        bool canResize = true;
+        int endX = InventoryPos.X + size.X + 1;
+        int endY = InventoryPos.Y + size.Y + 1;
+        Item[,] itemGrid = GridInventory.inv.itemGrid;
 
+        if (endY + addedSize.Y > 31 || endX + addedSize.X > 31)
+            canResize = false;
+        for (int i = 0; i < addedSize.Y; i++)
+        {
+            for (int x = InventoryPos.X; x < InventoryPos.X + size.X + addedSize.X; x++)
+            {
+                if (itemGrid[x, endY + i] != null)
+                {
+                    canResize = false;
+                }
+            }
+        }
+        for (int i = 0; i < addedSize.X; i++)
+        {
+            for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y + addedSize.Y; y++)
+            {
+                if (itemGrid[endX, y + i] != null)
+                {
+                    canResize = false;
+                }
+            }
+        }
+        return canResize;
+    }
+    public void Resize(Vector2i addedSize)
+    {
+        int endX = InventoryPos.X + size.X + 1;
+        int endY = InventoryPos.Y + size.Y + 1;
+        Item[,] itemGrid = GridInventory.inv.itemGrid;
+        size += addedSize;
+        for (int i = 0; i < addedSize.Y; i++)
+        {
+            for (int x = InventoryPos.X; x < InventoryPos.X + size.X + addedSize.X; x++)
+            {
+                itemGrid[x, endY + i] = this;
+            }
+        }
+        for (int i = 0; i < addedSize.X; i++)
+        {
+            for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y + addedSize.Y; y++)
+            {
+                itemGrid[endX, y + i] = this;
+            }
+        }
+    }
 }
 class Attachment : Item
 {
     public Vector2f spriteOffset = new Vector2f();
 }
-
 class Magazine : Attachment
 {
     public Type type = Type.Attachment;
