@@ -151,24 +151,53 @@ class Weapon : Item
     }
     public void Resize(Vector2i addedSize)
     {
+        int startX = InventoryPos.X;
+        int startY = InventoryPos.Y;
         int endX = InventoryPos.X + size.X;
         int endY = InventoryPos.Y + size.Y;
         Item[,] itemGrid = GridInventory.inv.itemGrid;
+
+        if (addedSize.Y < 0)
+        {
+            for (int i = 0; i < Math.Abs(addedSize.Y); i++)
+            {
+                for (int x = InventoryPos.X; x < InventoryPos.X + size.X + addedSize.X; x++)
+                {
+                    itemGrid[x, endY - i - 1] = null;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < addedSize.Y; i++)
+            {
+                for (int x = InventoryPos.X; x < InventoryPos.X + size.X + addedSize.X; x++)
+                {
+                    itemGrid[x, endY + i] = this;
+                }
+            }
+        }
+        if (addedSize.X < 0)
+        {
+            for (int i = 0; i < Math.Abs(addedSize.X); i++)
+            {
+                for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y + addedSize.Y; y++)
+                {
+                    itemGrid[endX - i - 1, y] = null;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < addedSize.X; i++)
+            {
+                for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y + addedSize.Y; y++)
+                {
+                    itemGrid[endX + i, y] = this;
+                }
+            }
+        }
         size += addedSize;
-        for (int i = 0; i < addedSize.Y; i++)
-        {
-            for (int x = InventoryPos.X; x < InventoryPos.X + size.X + addedSize.X; x++)
-            {
-                itemGrid[x, endY + i] = this;
-            }
-        }
-        for (int i = 0; i < addedSize.X; i++)
-        {
-            for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y + addedSize.Y; y++)
-            {
-                itemGrid[endX, y + i] = this;
-            }
-        }
     }
 }
 class Attachment : Item
