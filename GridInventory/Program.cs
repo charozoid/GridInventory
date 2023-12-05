@@ -19,6 +19,7 @@ class GridInventory
             Graphics.window.Clear(Color.Black);
             
             Graphics.DrawGrid();
+            Graphics.DrawItemSquare();
             inv.Think();
             Graphics.DrawItems();
             

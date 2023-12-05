@@ -35,6 +35,23 @@ class Graphics
             item.Draw();
         }
     }
+    public static void DrawItemSquare()
+    {
+        Item[,] itemGrid = GridInventory.inv.itemGrid;
+        for (int i = 0; i < itemGrid.GetLength(0); i++)
+        {
+            for (int j = 0; j < itemGrid.GetLength(1); j++)
+            {
+                if (itemGrid[i, j] != null)
+                {
+                    RectangleShape rectangle = new RectangleShape(new Vector2f(32, 32));
+                    rectangle.Position = new Vector2f(i * 32, j * 32);
+                    rectangle.FillColor = new Color(125, 125, 0, 255);
+                    window.Draw(rectangle);
+                }
+            }
+        }
+    }
     public static Vector2f GridToVector2f(Vector2i gridCoords)
     {
         return new Vector2f(gridCoords.X * 32, gridCoords.Y * 32);

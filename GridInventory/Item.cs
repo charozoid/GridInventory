@@ -121,8 +121,8 @@ class Weapon : Item
     public bool CanResize(Vector2i addedSize)
     {
         bool canResize = true;
-        int endX = InventoryPos.X + size.X + 1;
-        int endY = InventoryPos.Y + size.Y + 1;
+        int endX = InventoryPos.X + size.X;
+        int endY = InventoryPos.Y + size.Y;
         Item[,] itemGrid = GridInventory.inv.itemGrid;
 
         if (endY + addedSize.Y > 31 || endX + addedSize.X > 31)
@@ -151,8 +151,8 @@ class Weapon : Item
     }
     public void Resize(Vector2i addedSize)
     {
-        int endX = InventoryPos.X + size.X + 1;
-        int endY = InventoryPos.Y + size.Y + 1;
+        int endX = InventoryPos.X + size.X;
+        int endY = InventoryPos.Y + size.Y;
         Item[,] itemGrid = GridInventory.inv.itemGrid;
         size += addedSize;
         for (int i = 0; i < addedSize.Y; i++)
