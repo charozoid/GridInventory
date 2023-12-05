@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GridInventory", "GridInventory\GridInventory.csproj", "{C6900B4F-D2F6-4050-84D4-F14B7A6A2DCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GridInventory", "GridInventory\GridInventory.csproj", "{C6900B4F-D2F6-4050-84D4-F14B7A6A2DCE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6C8DD50D-5109-48D4-95DA-F4CA6D84B7EA}"
+	ProjectSection(SolutionItems) = preProject
+		GridInventory\bin\Assets\guns.png = GridInventory\bin\Assets\guns.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
