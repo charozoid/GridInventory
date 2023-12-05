@@ -107,10 +107,10 @@ class Inventory
 
                 if (!IsSquareEmpty(mousePos) && itemGrid[mousePos.X, mousePos.Y] is Weapon weapon && selectedItem is Attachment attachment)
                 {
-                    if (weapon.attachments[(int)attachment.type] == null && weapon.CanResize(new Vector2i(0, 1)))
+                    if (weapon.attachments[(int)attachment.type] == null && weapon.CanResize(attachment.resizeFactor))
                     {
                         weapon.AddAttachment(attachment);
-                        weapon.Resize(new Vector2i(0, 1));
+                        weapon.Resize(attachment.resizeFactor);
                     }
                     else
                     {
@@ -182,7 +182,7 @@ class Inventory
                     {
                         if (itemGrid[i, j] != null && itemGrid[i, j] != selectedItem)
                         {
-                            if (itemGrid[i, j] is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType))
+                            if (itemGrid[i, j] is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType) && weapon.CanResize(attachment.resizeFactor))
                             {
                                 rectangle.Position = weapon.sprite.Position;
                                 rectangle.Size = (Vector2f)weapon.size * 32;

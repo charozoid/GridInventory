@@ -50,6 +50,7 @@ class GridInventory
                 akMag.IntRect = new IntRect(32, 64, 32, 32);
                 akMag.size = new Vector2i(2, 2);
                 akMag.strRef = "mag_ak47";
+                akMag.resizeFactor = new Vector2i(0, 2);
                 akMag.spriteOffset = new Vector2f(142, 48);
                 inv.AddItem(akMag);
                 break;

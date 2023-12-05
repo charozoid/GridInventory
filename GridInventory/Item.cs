@@ -101,7 +101,7 @@ class Weapon : Item
         Attachment newAttachment = attachments[(int)attachmentType];
         attachments[(int)attachmentType] = null;
         GridInventory.inv.MoveItem(newAttachment, new Vector2i(0, 0));
-        Resize(new Vector2i(0, -1));
+        Resize(-newAttachment.resizeFactor);
     }
     public bool IsAttachmentCompatible(Attachment attachment)
     {
@@ -151,8 +151,6 @@ class Weapon : Item
     }
     public void Resize(Vector2i addedSize)
     {
-        int startX = InventoryPos.X;
-        int startY = InventoryPos.Y;
         int endX = InventoryPos.X + size.X;
         int endY = InventoryPos.Y + size.Y;
         Item[,] itemGrid = GridInventory.inv.itemGrid;
@@ -203,6 +201,7 @@ class Weapon : Item
 class Attachment : Item
 {
     public Vector2f spriteOffset = new Vector2f();
+    public Vector2i resizeFactor = new Vector2i();
 }
 class Magazine : Attachment
 {
