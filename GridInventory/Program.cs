@@ -40,7 +40,7 @@ class GridInventory
                 break;
             case (Keyboard.Key.Q):
                 Item glock = new Item();
-                glock.IntRect = new IntRect(196, 0, 64, 32);
+                glock.IntRect = new IntRect(192, 0, 64, 32);
                 glock.size = new Vector2i(3, 2);
                 glock.strRef = "weapon_glock";
                 inv.AddItem(glock);
@@ -50,7 +50,7 @@ class GridInventory
                 akMag.IntRect = new IntRect(32, 64, 32, 32);
                 akMag.size = new Vector2i(2, 2);
                 akMag.strRef = "mag_ak47";
-                akMag.resizeFactor = new Vector2i(0, 2);
+                akMag.resizeFactor = new Vector2i(0, 1);
                 akMag.spriteOffset = new Vector2f(142, 48);
                 inv.AddItem(akMag);
                 break;
