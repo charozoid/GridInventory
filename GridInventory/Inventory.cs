@@ -33,28 +33,15 @@ class Inventory
     }
     public void AddItem(Item item)
     {
+        Vector2i emptySpot = FindEmptySpot(item.size);
+        if (emptySpot.X == -1)
+        {
+            Console.WriteLine("Inventory full");
+            return;
+        }
+        item.InventoryPos = FindEmptySpot(item.size);
         int itemX = item.InventoryPos.X;
         int itemY = item.InventoryPos.Y;
-
-        int startingIndex = 0;
-        int count = 0;
-        while (count < item.size.X)
-        {
-            for (int i = startingIndex; i < item.size.X + itemX + startingIndex; i++)
-            {
-                if (itemGrid[i, 0] != null)
-                {
-                    break;
-                }
-                else
-                {
-                    count++;
-                }
-            }
-            startingIndex++;
-        }
-        item.InventoryPos = new Vector2i(startingIndex - 1, 0);
-
         for (int i = itemX; i < item.size.X + itemX; i++)
         {
             for (int j = itemY; j < item.size.Y + itemY; j++)
@@ -64,6 +51,46 @@ class Inventory
         }
         Graphics.itemList.Add(item);
     }
+
+    public Vector2i FindEmptySpot(Vector2i size)
+    {
+        Item[,] itemGrid = GridInventory.inv.itemGrid;
+
+        bool success = false;
+        Vector2i startingIndex = new Vector2i(0, 0);
+        int squareCounts = 0;
+        while (!success)
+        {
+            if (startingIndex.X + size.X > Graphics.GRID_SIZE.X)
+            {
+                startingIndex = new Vector2i(0, startingIndex.Y);
+                if (startingIndex.Y + size.Y >= Graphics.GRID_SIZE.Y)
+                {
+                    return new Vector2i(-1, -1);
+                }
+                startingIndex += new Vector2i(0, 1);
+            }
+
+            for (int i = startingIndex.X; i < startingIndex.X + size.X; i++)
+            {
+                for (int j = startingIndex.Y; j < startingIndex.Y + size.Y; j++)
+                {
+                    if (itemGrid[i, j] == null)
+                    {
+                        squareCounts++;
+                    }
+                }
+            }
+            if (squareCounts == size.X * size.Y)
+            {
+                return startingIndex;
+            }
+            startingIndex += new Vector2i(1, 0);
+            squareCounts = 0;
+        }
+        return startingIndex;
+    }
+
     public void RemoveItem(Item item)
     {
         if (item == null)
@@ -104,8 +131,8 @@ class Inventory
             case Mouse.Button.Left:
                 if (selectedItem == null)
                     return;
-
-                if (!IsSquareEmpty(mousePos) && itemGrid[mousePos.X, mousePos.Y] is Weapon weapon && selectedItem is Attachment attachment)
+                Item mouseItem = itemGrid[mousePos.X, mousePos.Y];
+                if (mouseItem is Weapon weapon && selectedItem is Attachment attachment)
                 {
                     if (weapon.attachments[(int)attachment.type] == null && weapon.CanResize(attachment.resizeFactor))
                     {
@@ -182,7 +209,7 @@ class Inventory
                     {
                         if (itemGrid[i, j] != null && itemGrid[i, j] != selectedItem)
                         {
-                            if (itemGrid[i, j] is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType) && weapon.CanResize(attachment.resizeFactor))
+                            if (itemGrid[i, j] is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType) && weapon.CanResize(attachment.resizeFactor) )
                             {
                                 rectangle.Position = weapon.sprite.Position;
                                 rectangle.Size = (Vector2f)weapon.size * 32;

@@ -55,6 +55,7 @@ class Weapon : Item
     public static void LoadCompatibleAttachments()
     {
         attachmentsList["weapon_ak47"] = new string[] { "mag_ak47" };
+        attachmentsList["weapon_glock"] = new string[] { "mag_glock" };
     }
     public override Vector2i InventoryPos
     {
@@ -96,11 +97,12 @@ class Weapon : Item
     }
     public void RemoveAttachment(AttachmentType attachmentType)
     {
+        Inventory inv = GridInventory.inv;
         if (attachments[(int)attachmentType] == null)
             return;
         Attachment newAttachment = attachments[(int)attachmentType];
         attachments[(int)attachmentType] = null;
-        GridInventory.inv.MoveItem(newAttachment, new Vector2i(0, 0));
+        inv.MoveItem(newAttachment, inv.FindEmptySpot(newAttachment.size));
         Resize(-newAttachment.resizeFactor);
     }
     public bool IsAttachmentCompatible(Attachment attachment)

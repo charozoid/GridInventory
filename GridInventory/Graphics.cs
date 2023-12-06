@@ -6,6 +6,7 @@ class Graphics
 {
     public const int WIDTH = 960;
     public const int HEIGHT = 576;
+    public static Vector2i GRID_SIZE = new Vector2i(30, 18);
     public static VideoMode mode = new VideoMode(WIDTH, HEIGHT);
     public static RenderWindow window = new RenderWindow(mode, "Inventory");
     public static Texture gunsTexture = new Texture("../../Assets/guns.png");

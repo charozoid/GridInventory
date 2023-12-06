@@ -19,7 +19,7 @@ class GridInventory
             Graphics.window.Clear(Color.Black);
             
             Graphics.DrawGrid();
-            Graphics.DrawItemSquare();
+            //Graphics.DrawItemSquare();
             inv.Think();
             Graphics.DrawItems();
             
@@ -39,7 +39,7 @@ class GridInventory
                 inv.AddItem(ak47);
                 break;
             case (Keyboard.Key.Q):
-                Item glock = new Item();
+                Weapon glock = new Weapon();
                 glock.IntRect = new IntRect(192, 0, 64, 32);
                 glock.size = new Vector2i(3, 2);
                 glock.strRef = "weapon_glock";
@@ -53,6 +53,15 @@ class GridInventory
                 akMag.resizeFactor = new Vector2i(0, 1);
                 akMag.spriteOffset = new Vector2f(142, 48);
                 inv.AddItem(akMag);
+                break;
+            case (Keyboard.Key.R):
+                Magazine glockMag = new Magazine();
+                glockMag.IntRect = new IntRect(64, 64, 16, 32);
+                glockMag.size = new Vector2i(1, 2);
+                glockMag.strRef = "mag_glock";
+                glockMag.resizeFactor = new Vector2i(0, 0);
+                glockMag.spriteOffset = new Vector2f(0, 0);
+                inv.AddItem(glockMag);
                 break;
         }
     }
