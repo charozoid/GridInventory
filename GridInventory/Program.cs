@@ -2,6 +2,8 @@
 using SFML.System;
 using SFML.Graphics;
 using SFML.Window;
+using static Item;
+
 class GridInventory
 {
     public static Inventory inv = new Inventory();
@@ -19,7 +21,7 @@ class GridInventory
             Graphics.window.Clear(Color.Black);
             
             Graphics.DrawGrid();
-            //Graphics.DrawItemSquare();
+            Graphics.DrawItemSquare();
             inv.Think();
             Graphics.DrawItems();
             
@@ -50,8 +52,10 @@ class GridInventory
                 akMag.IntRect = new IntRect(32, 64, 32, 32);
                 akMag.size = new Vector2i(2, 2);
                 akMag.strRef = "mag_ak47";
+                akMag.attachmentType = AttachmentType.Magazine;
                 akMag.resizeFactor = new Vector2i(0, 1);
                 akMag.spriteOffset = new Vector2f(142, 48);
+                akMag.resizeDirection = ResizeDirection.Bottom;
                 inv.AddItem(akMag);
                 break;
             case (Keyboard.Key.R):
@@ -59,9 +63,22 @@ class GridInventory
                 glockMag.IntRect = new IntRect(64, 64, 16, 32);
                 glockMag.size = new Vector2i(1, 2);
                 glockMag.strRef = "mag_glock";
+                glockMag.attachmentType = AttachmentType.Magazine;
                 glockMag.resizeFactor = new Vector2i(0, 0);
                 glockMag.spriteOffset = new Vector2f(0, 0);
+                glockMag.hide = true;
                 inv.AddItem(glockMag);
+                break;
+            case (Keyboard.Key.T):
+                Attachment aksilencer = new Attachment();
+                aksilencer.IntRect = new IntRect(240, 0, 48, 16);
+                aksilencer.size = new Vector2i(3, 1);
+                aksilencer.strRef = "silencer_ak47";
+                aksilencer.attachmentType = AttachmentType.Muzzle;
+                aksilencer.resizeFactor = new Vector2i(3, 0);
+                aksilencer.spriteOffset = new Vector2f(-80, 25);
+                aksilencer.resizeDirection = ResizeDirection.Left;
+                inv.AddItem(aksilencer);
                 break;
         }
     }

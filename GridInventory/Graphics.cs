@@ -10,7 +10,7 @@ class Graphics
     public static VideoMode mode = new VideoMode(WIDTH, HEIGHT);
     public static RenderWindow window = new RenderWindow(mode, "Inventory");
     public static Texture gunsTexture = new Texture("../../Assets/guns.png");
-    public static List<Item> itemList = new List<Item>();
+    public static List<Item> itemsToDraw = new List<Item>();
     
     public static void DrawGrid()
     {
@@ -27,7 +27,7 @@ class Graphics
     }
     public static void DrawItems()
     {
-        foreach (Item item in itemList)
+        foreach (Item item in itemsToDraw)
         {
             /*RectangleShape shape = new RectangleShape(new Vector2f(item.size.X * 32, item.size.Y * 32));
             shape.Position = item.sprite.Position;

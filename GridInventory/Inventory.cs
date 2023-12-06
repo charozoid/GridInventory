@@ -13,13 +13,17 @@ class Inventory
     {
         int itemX = item.oldPos.X;
         int itemY = item.oldPos.Y;
-        for (int i = itemX; i < item.size.X + itemX; i++)
+        if (itemX >= 0 && itemY >= 0)
         {
-            for (int j = itemY; j < item.size.Y + itemY; j++)
+            for (int i = itemX; i < item.size.X + itemX; i++)
             {
-                itemGrid[i, j] = null;
+                for (int j = itemY; j < item.size.Y + itemY; j++)
+                {
+                    itemGrid[i, j] = null;
+                }
             }
         }
+
         int gridX = gridCoords.X;
         int gridY = gridCoords.Y;
         for (int i = gridX; i < item.size.X + gridX; i++)
@@ -49,7 +53,7 @@ class Inventory
                 itemGrid[i, j] = item;
             }
         }
-        Graphics.itemList.Add(item);
+        Graphics.itemsToDraw.Add(item);
     }
 
     public Vector2i FindEmptySpot(Vector2i size)
@@ -103,7 +107,7 @@ class Inventory
                 itemGrid[i, j] = null;
             }
         }
-        Graphics.itemList.Remove(item);
+        Graphics.itemsToDraw.Remove(item);
     }
     public Item? GridToItem(Vector2i gridCoords)
     {
@@ -125,19 +129,25 @@ class Inventory
             case Mouse.Button.Right:
                 if (!IsSquareEmpty(mousePos) && itemGrid[mousePos.X, mousePos.Y] is Weapon weaponToRemove)
                 {
-                    weaponToRemove.RemoveAttachment(Item.AttachmentType.Magazine);
+                    weaponToRemove.RemoveAttachment(Item.AttachmentType.Muzzle);
+                }
+                break;
+            case Mouse.Button.Middle:
+                if (!IsSquareEmpty(mousePos) && itemGrid[mousePos.X, mousePos.Y] is Weapon weaponToRemoves)
+                {
+                    weaponToRemoves.RemoveAttachment(Item.AttachmentType.Magazine);
                 }
                 break;
             case Mouse.Button.Left:
                 if (selectedItem == null)
                     return;
                 Item mouseItem = itemGrid[mousePos.X, mousePos.Y];
-                if (mouseItem is Weapon weapon && selectedItem is Attachment attachment)
+                if (mouseItem is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment))
                 {
-                    if (weapon.attachments[(int)attachment.type] == null && weapon.CanResize(attachment.resizeFactor))
+                    if (weapon.attachments[(int)attachment.attachmentType] == null)
                     {
                         weapon.AddAttachment(attachment);
-                        weapon.Resize(attachment.resizeFactor);
+                        weapon.Resize(attachment.resizeDirection, attachment.resizeFactor);
                     }
                     else
                     {
@@ -199,7 +209,7 @@ class Inventory
             Vector2i mousePos = Graphics.MousePos();
             selectedItem.InventoryPos = mousePos;
             RectangleShape rectangle = new RectangleShape((Vector2f)(selectedItem.size * 32));
-            rectangle.Position = selectedItem.sprite.Position;
+            rectangle.Position = (Vector2f)selectedItem.InventoryPos * 32;
             rectangle.FillColor = new Color(0, 225, 0, 175);
             for (int i = mousePos.X; i < mousePos.X + selectedItem.size.X; i++)
             {
@@ -211,7 +221,7 @@ class Inventory
                         {
                             if (itemGrid[i, j] is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType) && weapon.CanResize(attachment.resizeFactor) )
                             {
-                                rectangle.Position = weapon.sprite.Position;
+                                rectangle.Position = (Vector2f)weapon.inventoryPos * 32;
                                 rectangle.Size = (Vector2f)weapon.size * 32;
                             }
                             else
