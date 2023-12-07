@@ -42,7 +42,7 @@ class GridInventory
                 break;
             case (Keyboard.Key.Q):
                 Weapon glock = new Weapon();
-                glock.IntRect = new IntRect(192, 0, 64, 32);
+                glock.IntRect = new IntRect(192, 0, 48, 32);
                 glock.size = new Vector2i(3, 2);
                 glock.strRef = "weapon_glock";
                 inv.AddItem(glock);
@@ -79,6 +79,17 @@ class GridInventory
                 aksilencer.spriteOffset = new Vector2f(-80, 25);
                 aksilencer.resizeDirection = ResizeDirection.Left;
                 inv.AddItem(aksilencer);
+                break;
+            case (Keyboard.Key.Y):
+                Attachment akHolo = new Attachment();
+                akHolo.IntRect = new IntRect(288, 0, 32, 32);
+                akHolo.size = new Vector2i(2, 2);
+                akHolo.strRef = "holo_ak47";
+                akHolo.attachmentType = AttachmentType.Scope;
+                akHolo.resizeFactor = new Vector2i(0, 0);
+                akHolo.spriteOffset = new Vector2f(175, -7);
+                akHolo.resizeDirection = ResizeDirection.Top;
+                inv.AddItem(akHolo);
                 break;
         }
     }
