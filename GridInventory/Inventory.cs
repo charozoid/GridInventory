@@ -142,12 +142,11 @@ class Inventory
                 if (selectedItem == null)
                     return;
                 Item mouseItem = itemGrid[mousePos.X, mousePos.Y];
-                if (mouseItem is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment))
+                if (mouseItem is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType))
                 {
-                    if (weapon.attachments[(int)attachment.attachmentType] == null)
+                    if (weapon.Resize(attachment.resizeDirection, attachment.resizeFactor))
                     {
                         weapon.AddAttachment(attachment);
-                        weapon.Resize(attachment.resizeDirection, attachment.resizeFactor);
                     }
                     else
                     {
@@ -183,7 +182,7 @@ class Inventory
                 {
                     areSquaresAvailable = false;
                 }
-                
+
 
             }
         }
@@ -204,37 +203,23 @@ class Inventory
     }
     public void Think()
     {
-        /*if (selectedItem != null)
+        if (selectedItem != null)
         {
+
             Vector2i mousePos = Graphics.MousePos();
             selectedItem.InventoryPos = mousePos;
-            RectangleShape rectangle = new RectangleShape((Vector2f)(selectedItem.size * 32));
-            rectangle.Position = (Vector2f)selectedItem.InventoryPos * 32;
-            rectangle.FillColor = new Color(0, 225, 0, 175);
-            for (int i = mousePos.X; i < mousePos.X + selectedItem.size.X; i++)
+            if (selectedItem is Attachment attachment && itemGrid[mousePos.X, mousePos.Y] is Weapon weapon)
             {
-                for (int j = mousePos.Y; j < mousePos.Y + selectedItem.size.Y; j++)
+                if (weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType) && weapon.CanExpand(attachment.resizeDirection, attachment.resizeFactor))
                 {
-                    if (i < 30 && i > 0 && j < 18 && j > 0)
-                    {
-                        if (itemGrid[i, j] != null && itemGrid[i, j] != selectedItem)
-                        {
-                            if (itemGrid[i, j] is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType) && weapon.CanResize(attachment.resizeFactor) )
-                            {
-                                rectangle.Position = (Vector2f)weapon.inventoryPos * 32;
-                                rectangle.Size = (Vector2f)weapon.size * 32;
-                            }
-                            else
-                            {
-                                rectangle.FillColor = new Color(225, 0, 0, 175);
-                            }
-                        }
-                    }
-
+                    weapon.shape.FillColor = new Color(0, 225, 0, 175);
+                }
+                else
+                {
+                    weapon.shape.FillColor = new Color(225, 0, 0, 175);
                 }
             }
 
-            Graphics.window.Draw(rectangle);
-        }*/
+        }
     }
 }

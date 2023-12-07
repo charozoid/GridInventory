@@ -18,7 +18,7 @@ class GridInventory
 
         while (Graphics.window.IsOpen)
         {
-            Graphics.window.Clear(Color.Black);
+            Graphics.window.Clear(new Color(20, 20, 25));
             
             Graphics.DrawGrid();
             //Graphics.DrawItemSquare();

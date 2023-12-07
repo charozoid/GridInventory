@@ -35,7 +35,6 @@ class Item
         set 
         {
             shape.Size = (Vector2f)value * 32;
-            shape.FillColor = new Color(64, 64, 64, 125);
             size = value; 
         }
     }
@@ -56,14 +55,15 @@ class Item
         set
         {
             inventoryPos = value;
+            Vector2f spritePos = Graphics.GridToVector2f(value) + (Vector2f)spriteGridOffset * 32;
             shape.Position = Graphics.GridToVector2f(value);
-            sprite.Position = Graphics.GridToVector2f(value);
+            sprite.Position = spritePos;
         }
     }
     public void Draw()
-    {
-
+    {      
         Graphics.window.Draw(shape);
+        shape.FillColor = new Color(30, 20, 40, 225);
         Graphics.window.Draw(sprite);
     }
     public virtual void Move(Vector2i gridCoords)
@@ -71,38 +71,7 @@ class Item
         InventoryPos = gridCoords;
 
     }
-    public bool CanResize(Vector2i addedSize)
-    {
-        bool canResize = true;
-        int endX = InventoryPos.X + size.X;
-        int endY = InventoryPos.Y + size.Y;
-        Item[,] itemGrid = GridInventory.inv.itemGrid;
-
-        if (endY + addedSize.Y > 18 || endX + addedSize.X > 30)
-            return false;
-        for (int i = 0; i < addedSize.Y; i++)
-        {
-            for (int x = InventoryPos.X; x < InventoryPos.X + size.X + addedSize.X; x++)
-            {
-                if (itemGrid[x, endY + i] != null)
-                {
-                    canResize = false;
-                }
-            }
-        }
-        for (int i = 0; i < addedSize.X; i++)
-        {
-            for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y + addedSize.Y; y++)
-            {
-                if (itemGrid[endX, y + i] != null)
-                {
-                    canResize = false;
-                }
-            }
-        }
-        return canResize;
-    }
-    public void Shrink(ResizeDirection direction, Vector2i shrinkedSize)
+    public bool CanExpand(ResizeDirection direction, Vector2i addedSize)
     {
         Item[,] itemGrid = GridInventory.inv.itemGrid;
         int startX = InventoryPos.X;
@@ -112,44 +81,105 @@ class Item
         switch (direction)
         {
             case ResizeDirection.Left:
+                for (int i = 0; i < addedSize.X; i++)
+                {
+                    for (int y = startY; y < endY; y++)
+                    {
+                        if (startX - i - 1 < 0 || itemGrid[startX - i - 1, y] != null)
+                            return false;
+                    }
+                }
+                break;
+            case ResizeDirection.Right:
+                for (int i = 0; i < addedSize.X; i++)
+                {
+                    for (int y = startY; y < startY + size.Y + addedSize.Y; y++)
+                    {
+                        if (endX + i > 29 || itemGrid[endX + i, y] != null)
+                            return false;                     
+                    }
+                }
+                break;
+            case ResizeDirection.Top:
+                for (int i = 0; i < addedSize.Y; i++)
+                {
+                    for (int x = startX; x < InventoryPos.X + size.X; x++)
+                    {
+                        if (startY - i - 1 < 0 || itemGrid[x, startY - i - 1] != null)
+                            return false;
+                    }
+                }
+                break;
+            case ResizeDirection.Bottom:
+                for (int i = 0; i < addedSize.Y; i++)
+                {
+                    for (int x = InventoryPos.X; x < endX; x++)
+                    {
+                        if (endY + i > 17 || itemGrid[x, endY + i] != null)
+                            return false;
+                    }
+                }
+                break;
+        }
+        return true;
+    }
+    public void Shrink(ResizeDirection direction, Vector2i shrinkedSize)
+    {
+        Item[,] itemGrid = GridInventory.inv.itemGrid;
+        int startX = InventoryPos.X;
+        int startY = InventoryPos.Y;
+        int endX = InventoryPos.X + size.X;
+        int endY = InventoryPos.Y + size.Y;
+        int absX = Math.Abs(shrinkedSize.X);
+        int absY = Math.Abs(shrinkedSize.Y);
+        switch (direction)
+        {
+            case ResizeDirection.Left:
+
                 itemGrid[startX, startY].spriteGridOffset += shrinkedSize;
-                for (int i = 0; i < Math.Abs(shrinkedSize.X); i++)
+                for (int i = 0; i < absX; i++)
                 {
                     for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y; y++)
                     {
                         itemGrid[startX + i, y] = null;
                     }
                 }
-                
+                itemGrid[startX + absX, startY].shape.Size += (Vector2f) shrinkedSize * 32;
+                itemGrid[startX + absX, startY].shape.Position -= (Vector2f)shrinkedSize * 32;
                 inventoryPos -= shrinkedSize;
                 break;
             case ResizeDirection.Right:
-                for (int i = 0; i < Math.Abs(shrinkedSize.X); i++)
+                for (int i = 0; i < absX; i++)
                 {
                     for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y; y++)
                     {
                         itemGrid[endX - i - 1, y] = null;
                     }
                 }
+                itemGrid[startX, startY].shape.Size += (Vector2f)shrinkedSize * 32;
                 break;
             case ResizeDirection.Top:
                 itemGrid[startX, startY].spriteGridOffset += shrinkedSize;
-                for (int i = 0; i < Math.Abs(shrinkedSize.Y); i++)
+                for (int i = 0; i < absY; i++)
                 {
                     for (int x = startX; x < endX; x++)
                     {
-                        itemGrid[x, startY - i - 1] = null;
+                        itemGrid[x, startY - i] = null;
                     }
                 }
+                itemGrid[startX, startY + absY].shape.Size += (Vector2f)shrinkedSize * 32;
+                itemGrid[startX, startY + absY].shape.Position -= (Vector2f)shrinkedSize * 32;
+                inventoryPos -= shrinkedSize;
                 break;
             case ResizeDirection.Bottom:
-                for (int i = 0; i < Math.Abs(shrinkedSize.Y); i++)
+                for (int i = 0; i < absY; i++)
                 {
                     for (int x = startX; x < endX; x++)
                     {
                         itemGrid[x, endY - i - 1] = null;
                     }
                 }
+                itemGrid[startX, startY + absY].shape.Size += (Vector2f)shrinkedSize * 32;
                 break;
         }
         size += shrinkedSize;
@@ -172,6 +202,8 @@ class Item
                     }
                 }
                 itemGrid[startX, startY].spriteGridOffset += addedSize;
+                itemGrid[startX, startY].shape.Size += (Vector2f)addedSize * 32;
+                itemGrid[startX, startY].shape.Position -= (Vector2f)addedSize * 32;
                 inventoryPos -= addedSize;
                 break;
             case ResizeDirection.Right:
@@ -181,7 +213,9 @@ class Item
                     {
                         itemGrid[endX + i, y] = this;
                     }
+
                 }
+                itemGrid[startX, startY].shape.Size += (Vector2f)addedSize * 32;
                 break;
             case ResizeDirection.Top:
                 for (int i = 0; i < addedSize.Y; i++)
@@ -191,6 +225,8 @@ class Item
                         itemGrid[x, startY - i - 1] = this;
                     }
                 }
+                itemGrid[startX, startY - addedSize.Y].shape.Size += (Vector2f)addedSize * 32;
+                itemGrid[startX, startY - addedSize.Y].shape.Position -= (Vector2f)addedSize * 32;
                 itemGrid[startX, startY].spriteGridOffset = addedSize;
                 inventoryPos -= addedSize;
                 break;
@@ -202,21 +238,25 @@ class Item
                         itemGrid[x, endY + i] = this;
                     }
                 }
+                itemGrid[startX, startY].shape.Size += (Vector2f)addedSize * 32;
                 break;
         }
         size += addedSize;
     }
-    public void Resize(ResizeDirection direction, Vector2i addedSize)
+    public bool Resize(ResizeDirection direction, Vector2i addedSize)
     {
         if (addedSize.X > 0 || addedSize.Y > 0)
         {
+            if (!CanExpand(direction, addedSize))
+                return false;
             Expand(direction, addedSize);
+                return true;
         }
         else
         {
             Shrink(direction, addedSize);
+            return true;
         }
-
     }
 }
 class Weapon : Item
@@ -234,7 +274,9 @@ class Weapon : Item
         set
         {
             inventoryPos = value;
-            sprite.Position = Graphics.GridToVector2f(value) + (Vector2f)spriteGridOffset * 32;
+            Vector2f spritePos = Graphics.GridToVector2f(value) + (Vector2f)spriteGridOffset * 32;
+            shape.Position = (Vector2f)inventoryPos * 32;
+            sprite.Position = spritePos;
             for (int i = 0; i < attachments.Length; i++)
             {
                 if (attachments[i] != null)
@@ -257,6 +299,7 @@ class Weapon : Item
         int attachX = attachment.oldPos.X;
         int attachY = attachment.oldPos.Y;
         attachment.oldPos = new Vector2i(-1, -1);
+        attachment.shape.Size = new Vector2f(0, 0);
         for (int i = attachX; i < attachment.size.X + attachX; i++)
         {
             for (int j = attachY; j < attachment.size.Y + attachY; j++)
@@ -297,7 +340,6 @@ class Weapon : Item
     {
         return attachments[(int)attachmentType] == null;
     }
-
 }
 class Attachment : Item
 {
