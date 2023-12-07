@@ -18,7 +18,7 @@ class Item
         Scope,
         Muzzle
     }
-    public RectangleShape shape;
+    public RectangleShape shape = new RectangleShape(new Vector2f(0,0));
     public Sprite sprite { get; set; }
     public IntRect intRect;
     public Vector2i size { get; set; }
@@ -29,7 +29,16 @@ class Item
     public AttachmentType attachmentType;
     public string strRef = "";
 
-
+    public Vector2i Size
+    {
+        get { return size; }
+        set 
+        {
+            shape.Size = (Vector2f)value * 32;
+            shape.FillColor = new Color(64, 64, 64, 125);
+            size = value; 
+        }
+    }
     public IntRect IntRect
     {
         get { return intRect; }
@@ -47,11 +56,14 @@ class Item
         set
         {
             inventoryPos = value;
+            shape.Position = Graphics.GridToVector2f(value);
             sprite.Position = Graphics.GridToVector2f(value);
         }
     }
     public void Draw()
     {
+
+        Graphics.window.Draw(shape);
         Graphics.window.Draw(sprite);
     }
     public virtual void Move(Vector2i gridCoords)
@@ -261,14 +273,14 @@ class Weapon : Item
     }
     public void RemoveAttachment(AttachmentType attachmentType)
     {
+        if (IsAttachmentSlotEmpty(attachmentType)) return;
+
         Inventory inv = GridInventory.inv;
-        if (attachments[(int)attachmentType] == null)
-            return;
-        Attachment newAttachment = attachments[(int)attachmentType];
+        Attachment attachment = attachments[(int)attachmentType];
+        inv.MoveItem(attachment, inv.FindEmptySpot(attachment.size));
         attachments[(int)attachmentType] = null;
-        Graphics.itemsToDraw.Add(newAttachment);
-        inv.MoveItem(newAttachment, inv.FindEmptySpot(newAttachment.size));
-        Resize(newAttachment.resizeDirection, -newAttachment.resizeFactor);
+        Graphics.itemsToDraw.Add(attachment);
+        Resize(attachment.resizeDirection, -attachment.resizeFactor);
     }
     public bool IsAttachmentCompatible(Attachment attachment)
     {
@@ -292,7 +304,6 @@ class Attachment : Item
     public Vector2f spriteOffset = new Vector2f();
     public Vector2i resizeFactor = new Vector2i();
     public ResizeDirection resizeDirection = ResizeDirection.Left;
-    public AttachmentType attachmentType;
     public bool hide = false;
 }
 class Magazine : Attachment

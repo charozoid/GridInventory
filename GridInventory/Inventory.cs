@@ -204,7 +204,7 @@ class Inventory
     }
     public void Think()
     {
-        if (selectedItem != null)
+        /*if (selectedItem != null)
         {
             Vector2i mousePos = Graphics.MousePos();
             selectedItem.InventoryPos = mousePos;
@@ -235,6 +235,6 @@ class Inventory
             }
 
             Graphics.window.Draw(rectangle);
-        }
+        }*/
     }
 }
