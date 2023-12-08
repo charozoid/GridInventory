@@ -142,7 +142,10 @@ class Inventory
                 if (selectedItem == null)
                     return;
                 Item mouseItem = itemGrid[mousePos.X, mousePos.Y];
-                if (mouseItem is Weapon weapon && selectedItem is Attachment attachment && weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType))
+                if (mouseItem is Weapon weapon 
+                    && selectedItem is Attachment attachment 
+                    && weapon.IsAttachmentCompatible(attachment) 
+                    && weapon.IsAttachmentSlotEmpty(attachment.attachmentType))
                 {
                     if (weapon.Resize(attachment.resizeDirection, attachment.resizeFactor))
                     {
@@ -201,23 +204,30 @@ class Inventory
         }
 
     }
-    public void Think()
+    public void ItemSelected()
     {
         if (selectedItem != null)
         {
-
+            selectedItem.shape.FillColor = new Color(0, 225, 0, 175);
             Vector2i mousePos = Graphics.MousePos();
             selectedItem.InventoryPos = mousePos;
             if (selectedItem is Attachment attachment && itemGrid[mousePos.X, mousePos.Y] is Weapon weapon)
             {
-                if (weapon.IsAttachmentCompatible(attachment) && weapon.IsAttachmentSlotEmpty(attachment.attachmentType) && weapon.CanExpand(attachment.resizeDirection, attachment.resizeFactor))
-                {
-                    weapon.shape.FillColor = new Color(0, 225, 0, 175);
-                }
-                else
+                if (!weapon.IsAttachmentCompatible(attachment) ||
+                    !weapon.IsAttachmentSlotEmpty(attachment.attachmentType) ||
+                    !weapon.CanExpand(attachment.resizeDirection, attachment.resizeFactor))
                 {
                     weapon.shape.FillColor = new Color(225, 0, 0, 175);
                 }
+                else
+                {
+                    weapon.shape.FillColor = new Color(0, 225, 0, 175);
+                }
+                selectedItem.shape.Size = new Vector2f(0, 0);
+            }
+            else if (!AreSquaresAvailable(mousePos))
+            {
+                selectedItem.shape.FillColor = new Color(225, 0, 0, 175);
             }
 
         }

@@ -18,7 +18,7 @@ class Item
         Scope,
         Muzzle
     }
-    public RectangleShape shape = new RectangleShape(new Vector2f(0,0));
+    public RectangleShape shape = new RectangleShape(new Vector2f(0, 0));
     public Sprite sprite { get; set; }
     public IntRect intRect;
     public Vector2i size { get; set; }
@@ -32,10 +32,10 @@ class Item
     public Vector2i Size
     {
         get { return size; }
-        set 
+        set
         {
             shape.Size = (Vector2f)value * 32;
-            size = value; 
+            size = value;
         }
     }
     public IntRect IntRect
@@ -57,11 +57,12 @@ class Item
             inventoryPos = value;
             Vector2f spritePos = Graphics.GridToVector2f(value) + (Vector2f)spriteGridOffset * 32;
             shape.Position = Graphics.GridToVector2f(value);
+            shape.Size = (Vector2f)size * 32;
             sprite.Position = spritePos;
         }
     }
-    public void Draw()
-    {      
+    public virtual void Draw()
+    {
         Graphics.window.Draw(shape);
         shape.FillColor = new Color(30, 20, 40, 225);
         Graphics.window.Draw(sprite);
@@ -69,7 +70,6 @@ class Item
     public virtual void Move(Vector2i gridCoords)
     {
         InventoryPos = gridCoords;
-
     }
     public bool CanExpand(ResizeDirection direction, Vector2i addedSize)
     {
@@ -96,7 +96,7 @@ class Item
                     for (int y = startY; y < startY + size.Y + addedSize.Y; y++)
                     {
                         if (endX + i > 29 || itemGrid[endX + i, y] != null)
-                            return false;                     
+                            return false;
                     }
                 }
                 break;
@@ -139,19 +139,19 @@ class Item
                 itemGrid[startX, startY].spriteGridOffset += shrinkedSize;
                 for (int i = 0; i < absX; i++)
                 {
-                    for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y; y++)
+                    for (int y = InventoryPos.Y; y < endY; y++)
                     {
                         itemGrid[startX + i, y] = null;
                     }
                 }
-                itemGrid[startX + absX, startY].shape.Size += (Vector2f) shrinkedSize * 32;
+                itemGrid[startX + absX, startY].shape.Size += (Vector2f)shrinkedSize * 32;
                 itemGrid[startX + absX, startY].shape.Position -= (Vector2f)shrinkedSize * 32;
                 inventoryPos -= shrinkedSize;
                 break;
             case ResizeDirection.Right:
                 for (int i = 0; i < absX; i++)
                 {
-                    for (int y = InventoryPos.Y; y < InventoryPos.Y + size.Y; y++)
+                    for (int y = InventoryPos.Y; y < endY; y++)
                     {
                         itemGrid[endX - i - 1, y] = null;
                     }
@@ -220,7 +220,7 @@ class Item
             case ResizeDirection.Top:
                 for (int i = 0; i < addedSize.Y; i++)
                 {
-                    for (int x = startX; x < InventoryPos.X + size.X; x++)
+                    for (int x = startX; x < endX; x++)
                     {
                         itemGrid[x, startY - i - 1] = this;
                     }
@@ -250,7 +250,7 @@ class Item
             if (!CanExpand(direction, addedSize))
                 return false;
             Expand(direction, addedSize);
-                return true;
+            return true;
         }
         else
         {
@@ -290,6 +290,19 @@ class Weapon : Item
     {
         InventoryPos = gridCoords;
     }
+    public override void Draw()
+    {
+        base.Draw();
+        foreach (Attachment attachment in attachments)
+        {
+            if (attachment != null && !attachment.hide)
+            {
+                Graphics.window.Draw(attachment.sprite);
+            }
+
+        }
+
+    }
     public void AddAttachment(Attachment attachment)
     {
         if (!IsAttachmentCompatible(attachment) || attachments[(int)attachment.attachmentType] != null)
@@ -307,10 +320,8 @@ class Weapon : Item
                 GridInventory.inv.itemGrid[i, j] = null;
             }
         }
-        if (attachment.hide)
-        {
-            Graphics.itemsToDraw.Remove(attachment);
-        }
+        Graphics.itemsToDraw.Remove(attachment);
+
         Vector2f weaponSpritePos = sprite.Position;
         attachment.sprite.Position = new Vector2f(weaponSpritePos.X, weaponSpritePos.Y) + attachment.spriteOffset;
     }
@@ -320,6 +331,7 @@ class Weapon : Item
 
         Inventory inv = GridInventory.inv;
         Attachment attachment = attachments[(int)attachmentType];
+        attachment.shape.Size = (Vector2f)attachment.size * 32;
         inv.MoveItem(attachment, inv.FindEmptySpot(attachment.size));
         attachments[(int)attachmentType] = null;
         Graphics.itemsToDraw.Add(attachment);

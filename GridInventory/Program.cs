@@ -22,7 +22,7 @@ class GridInventory
             
             Graphics.DrawGrid();
             //Graphics.DrawItemSquare();
-            inv.Think();
+            inv.ItemSelected();
             Graphics.DrawItems();
             
             Graphics.window.DispatchEvents();
