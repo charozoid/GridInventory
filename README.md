@@ -1,4 +1,4 @@
-##Grid inventory system with gun attachment support
+## Grid inventory system with gun attachment support
 
 ![image](https://github.com/charozoid/GridInventory/assets/13021889/453907bf-784f-4217-925d-26f042a3cf52)
 
